@@ -32,8 +32,19 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({
   storage,
-  limits: { fileSize: 3 * 1024 * 1024 }, // 3 MB
+  limits: { fileSize: 3 * 1024 * 1024 },
   fileFilter,
 });
+
+export const deleteImage = (upload_menu) => {
+  const filePath = path.join(__dirname, '../assets', upload_menu);
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      console.error('Error deleting file:', err);
+    } else {
+      console.log('File deleted successfully:', upload_menu);
+    }
+  });
+};
 
 export default upload;

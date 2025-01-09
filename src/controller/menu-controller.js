@@ -1,5 +1,6 @@
 import MenuModel from '../models/menu-model.js';
 import requestResponse from '../config/response.js';
+import { deleteImage } from '../middleware/uploadConfig.js';
 
 const getAll = async (req, res) => {
   try {
@@ -43,7 +44,6 @@ const getById = async (req, res) => {
     };
     res.json(requestResponse.suksesWithData(getMenu));
   } catch (error) {
-    console.log('error', error);
     res.status(500).json(requestResponse.errorServer(error));
   }
 }
@@ -78,7 +78,6 @@ const getByStatus = async (req, res) => {
   try {
     const data = await MenuModel.getByStatus(status);
     const dataStatus = data.map(item =>
-    // console.log('item', item)
     ({
       id: item.id,
       name: item.name,
@@ -150,9 +149,25 @@ const updateOne = async (req, res) => {
   }
 }
 
+// const deleteOne = async (req, res) => {
+//   const { id } = req.params;
+//   try {
+//     await MenuModel.deleteOne(id);
+//     res.json(requestResponse.successDeleteData());
+//   } catch (error) {
+//     res.status(500).json(requestResponse.errorServer(error));
+//   }
+// }
+
 const deleteOne = async (req, res) => {
   const { id } = req.params;
   try {
+    const existingMenu = await MenuModel.getById(id);
+    if (existingMenu.upload_menu) {
+      deleteImage(existingMenu.upload_menu);
+    }
+
+    // Hapus entri dari database
     await MenuModel.deleteOne(id);
     res.json(requestResponse.successDeleteData());
   } catch (error) {
