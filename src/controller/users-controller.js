@@ -12,12 +12,11 @@ const register = async (req, res) => {
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-
     await UsersModel.createUser({
       username,
       email,
       password: hashedPassword,
-      role,
+      role: role || 2,
     });
 
     res.status(201).json(requestResponse.successCreateData(req.body));
@@ -28,9 +27,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   const { identifier, password } = req.body;
-
   if (!identifier || !password) {
-    console.log('Login error: missing identifier or password');
     return res.status(400).json({ message: 'Username/Email and password are required' });
   }
 
@@ -53,7 +50,8 @@ const login = async (req, res) => {
       { expiresIn: '1h' }
     );
 
-    res.status(200).json(requestResponse.successLogin(user, token));
+    // Sertakan id_user dalam respons login
+    res.status(200).json(requestResponse.successLogin({ ...user, id_user: user.id }));
   } catch (error) {
     res.status(500).json(requestResponse.errorServer(error));
   }

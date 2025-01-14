@@ -5,7 +5,7 @@ import { deleteImage } from '../middleware/uploadConfig.js';
 const getAll = async (req, res) => {
   try {
     const data = await MenuModel.getAll();
-    const getMenu = data.map(item =>
+    const menu = data.map(item =>
     ({
       id: item.id,
       name: item.name,
@@ -19,7 +19,7 @@ const getAll = async (req, res) => {
         description: item.category_description,
       }
     }));
-    res.json(requestResponse.suksesWithData(getMenu));
+    res.json(requestResponse.suksesWithData(menu));
   } catch (error) {
     res.status(500).json(requestResponse.errorServer(error));
   }
@@ -148,16 +148,6 @@ const updateOne = async (req, res) => {
     res.status(500).json(requestResponse.errorServer(error));
   }
 }
-
-// const deleteOne = async (req, res) => {
-//   const { id } = req.params;
-//   try {
-//     await MenuModel.deleteOne(id);
-//     res.json(requestResponse.successDeleteData());
-//   } catch (error) {
-//     res.status(500).json(requestResponse.errorServer(error));
-//   }
-// }
 
 const deleteOne = async (req, res) => {
   const { id } = req.params;

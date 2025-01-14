@@ -8,6 +8,7 @@ const create = (body) => {
   return dbPool.execute(SQLQuery);
 };
 
+
 const getAll = async () => {
   const SQLQuery = `
     SELECT menus.*, categories.name as category_name, categories.description as category_description

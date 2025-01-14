@@ -29,7 +29,6 @@ const getById = async (id) => {
   return rows[0];
 }
 
-
 const updateUser = async (body, id) => {
   const SQLQuery = `UPDATE users SET username = ?, email = ? WHERE id = ?`;
   const [result] = await dbPool.execute(SQLQuery, [body.username, body.email, id]);
