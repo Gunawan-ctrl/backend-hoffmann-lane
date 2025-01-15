@@ -11,26 +11,29 @@ const snap = new midtransClient.Snap({
   clientKey: process.env.MIDTRANS_CLIENT_KEY,
 });
 
-// const createTransaction = async (req, res) => {
-//   const { body } = req;
-//   try {
-//     console.log('Creating transaction with data:', body);
-//     await transactionModel.createTransaction(body);
-//     res.json(requestResponse.successCreateData(body));
-//   } catch (error) {
-//     console.error('Error creating transaction:', error);
-//     res.status(500).json(requestResponse.errorServer(error));
-//   }
-// };
-
 const createTransaction = async (req, res) => {
-  const { body } = req;
+  const { id_user, id_order, total_price, id_menu } = req.body;
+  const gross_amount = total_price;
+
+  // Check if required fields are present
+  if (!gross_amount || !id_user || !id_order || !id_menu) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
   try {
-    console.log('Creating transaction with data:', body);
-    await transactionModel.createTransaction(body);
+    // Create transaction in the database
+    const result = await transactionModel.createTransaction({
+      gross_amount,
+      payment_type: null, // Example payment type
+      transaction_time: new Date(),
+      transaction_status: 'pending',
+      id_user,
+      id_order,
+      id_menu,
+    });
 
     // Fetch the newly created transaction
-    const newTransaction = await transactionModel.getTransactionById(body.transaction_id);
+    const newTransaction = await transactionModel.getTransactionById(result.insertId);
 
     // Create Snap token
     const parameter = {
@@ -42,16 +45,15 @@ const createTransaction = async (req, res) => {
         secure: true,
       },
     };
+
     const transaction = await snap.createTransaction(parameter);
 
     res.json(requestResponse.successCreateData({
       transaction: newTransaction,
       snapToken: transaction.token,
     }));
-    console.log('newTransaction', newTransaction);
-    console.log('Snap Token', transaction.token);
   } catch (error) {
-    console.error('Error creating transaction:', error);
+    console.log('error', error);
     res.status(500).json(requestResponse.errorServer(error));
   }
 };
@@ -59,7 +61,6 @@ const createTransaction = async (req, res) => {
 const getAll = async (req, res) => {
   try {
     const data = await transactionModel.getAll();
-    console.log('Fetched transactions:', data);
     const transactions = data.map((item) => ({
       id: item.id,
       transaction_id: item.transaction_id,
@@ -77,6 +78,10 @@ const getAll = async (req, res) => {
         qty: item.order_qty,
         total_price: item.order_total_price,
       },
+      menu: {
+        id: item.id_menu,
+        name: item.menu_name,
+      }
     }));
     res.json(requestResponse.suksesWithData(transactions));
   }
@@ -115,30 +120,24 @@ const getTransactionByIdUser = async (req, res) => {
   }
 };
 
-const getSnapToken = async (req, res) => {
-  const { id_order, total_price } = req.body;
+const updateTransaction = async (req, res) => {
+  const { transaction_id } = req.params;
+  const { body } = req;
+
   try {
-    const parameter = {
-      transaction_details: {
-        order_id: id_order,
-        gross_amount: total_price,
-      },
-      credit_card: {
-        secure: true,
-      },
-    };
-    const transaction = await snap.createTransaction(parameter);
-    res.json(requestResponse.suksesWithData(transaction));
-    console.log('transaction', transaction);
-  } catch (error) {
-    console.error('Error creating Snap token:', error);
+    await transactionModel.updateTransaction(transaction_id, body);
+    const updatedTransaction = await transactionModel.getTransactionById(transaction_id);
+    res.json(requestResponse.successUpdateData(updatedTransaction));
+  }
+  catch (error) {
     res.status(500).json(requestResponse.errorServer(error));
   }
-};
+}
+
 
 export default {
   createTransaction,
   getAll,
   getTransactionByIdUser,
-  getSnapToken,
+  updateTransaction,
 };

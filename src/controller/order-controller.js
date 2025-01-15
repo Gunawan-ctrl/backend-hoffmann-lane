@@ -65,38 +65,6 @@ const getAll = async (req, res) => {
   }
 }
 
-// const getById = async (req, res) => {
-//   const { id } = req.params;
-//   try {
-//     const data = await orderModel.getById(id);
-//     const order = data.map(item => ({
-//       id: item.id,
-//       user: {
-//         id: item.id_user,
-//         username: item.user_username,
-//         email: item.user_email
-//       },
-//       menu: {
-//         id: item.id_menu,
-//         name: item.menu_name,
-//         description: item.menu_description,
-//         price: item.menu_price,
-//         upload_menu: item.menu_upload_menu,
-//         category: {
-//           id: item.idKategori,
-//           name: item.category_name,
-//           description: item.category_description
-//         }
-//       },
-//       qty: item.qty,
-//       total_price: item.total_price
-//     }));
-//     res.json(requestResponse.suksesWithData(order));
-//   } catch (error) {
-//     res.status(500).json(requestResponse.errorServer(error));
-//   }
-// }
-
 const getByIdUser = async (req, res) => {
   const { id_user } = req.params;
   console.log('id_user', id_user);

@@ -29,28 +29,6 @@ const getAll = async () => {
   return rows;
 }
 
-// const getById = async (id) => {
-//   const SQLQuery = `
-//     SELECT
-//       orders.*,
-//       users.username as user_username,
-//       users.email as user_email,
-//       menus.name as menu_name,
-//       menus.description as menu_description,
-//       menus.price as menu_price,
-//       menus.upload_menu as menu_upload_menu,
-//       categories.name as category_name,
-//       categories.description as category_description
-//     FROM orders
-//     JOIN users ON orders.id_user = users.id
-//     JOIN menus ON orders.id_menu = menus.id
-//     JOIN categories ON menus.idKategori = categories.id
-//     WHERE orders.id = ?
-//   `;
-//   const [rows] = await dbPool.execute(SQLQuery, [id]);
-//   return rows;
-// }
-
 const getByIdUser = async (id_user) => {
   const SQLQuery = `
     SELECT
@@ -94,7 +72,6 @@ const deleteOne = async (id) => {
 export default {
   create,
   getAll,
-  // getById,
   getByIdUser,
   updateOne,
   deleteOne

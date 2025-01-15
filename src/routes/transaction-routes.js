@@ -6,6 +6,6 @@ const router = express.Router();
 router.post('/', TransactionController.createTransaction);
 router.get('/', TransactionController.getAll);
 router.get('/:id_user', TransactionController.getTransactionByIdUser);
-router.post('/snap-token', TransactionController.getSnapToken);
+router.put('/:transaction_id', TransactionController.updateTransaction);
 
 export default router;
