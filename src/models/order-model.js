@@ -1,46 +1,33 @@
 import dbPool from '../config/database.js';
 
-// const create = (body) => {
-//   const SQLQuery = `
-//     INSERT INTO orders (gross_amount, order_time, order_status, id_order, id_user, id_menu,  no_telp, alamat, qty, table)
-//     VALUES ('${body.gross_amount}', '${body.order_time}', '${body.order_status}', '${body.id_order}', '${body.id_user}', '${body.id_menu}', '${body.no_telp}', '${body.alamat}', '${body.qty}', '${body.table}')
-//   `;
-//   return dbPool.execute(SQLQuery);
-// }
-
 const create = (body) => {
   const SQLQuery = `
-    INSERT INTO orders (gross_amount, order_time, order_status, id_order, qty,   \`table\`)
-    VALUES ('${body.gross_amount}', '${body.order_time}', '${body.order_status}', '${body.id_order}',  '${body.qty}', '${body.table}')
+    INSERT INTO orders (gross_amount, order_time, order_status, qty,   \`table\`)
+    VALUES ('${body.gross_amount}', '${body.order_time}', '${body.order_status}',  '${body.qty}', '${body.table}')
   `;
   return dbPool.execute(SQLQuery);
 }
 
-// const getAll = async () => {
-//   const SQLQuery = `
-//     SELECT
-//       orders.*,
-//       users.username as user_username,
-//       users.email as user_email,
-//       menus.name as menu_name,
-//       menus.description as menu_description,
-//       menus.price as menu_price,
-//       menus.upload_menu as menu_upload_menu,
-//       categories.name as category_name,
-//       categories.description as category_description
-//     FROM orders
-//     JOIN users ON orders.id_user = users.id
-//     JOIN menus ON orders.id_menu = menus.id
-//     JOIN categories ON menus.idKategori = categories.id
-//   `;
-//   const [rows] = await dbPool.execute(SQLQuery);
-//   return rows;
-// }
 const getAll = async () => {
   const SQLQuery = `
     SELECT
-      orders.*
+      orders.id,
+      orders.gross_amount,
+      orders.order_time,
+      orders.order_status,
+      orders.qty,
+      orders.\`table\`,
+      JSON_ARRAYAGG(
+        JSON_OBJECT(
+          'id_menu', orders_menus.id_menu,
+          'id_order', orders_menus.id_order,
+          'qty', orders_menus.qty,
+          'total', orders_menus.total
+        )
+      ) AS items
     FROM orders
+    LEFT JOIN orders_menus ON orders.id = orders_menus.id_order
+    GROUP BY orders.id
   `;
   const [rows] = await dbPool.execute(SQLQuery);
   return rows;

@@ -18,6 +18,30 @@ const getAll = async () => {
   return rows;
 }
 
+// const getAll = async () => {
+//   const SQLQuery = `
+//     SELECT
+//       orders.id,
+//       orders.gross_amount,
+//       orders.order_time,
+//       orders.order_status,
+//       orders.qty,
+//       orders.\`table\`,
+//       JSON_ARRAYAGG(
+//         JSON_OBJECT(
+//           'id_menu', orders_menus.id_menu,
+//           'qty', orders_menus.qty,
+//           'total', orders_menus.total
+//         )
+//       ) AS items
+//     FROM orders
+//     LEFT JOIN orders_menus ON orders.id = orders_menus.id_order
+//     GROUP BY orders.id
+//   `;
+//   const [rows] = await dbPool.execute(SQLQuery);
+//   return rows;
+// }
+
 const getById = async (id) => {
   const SQLQuery = `
     SELECT * FROM orders_menus WHERE id = ?`;
