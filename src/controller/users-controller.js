@@ -57,6 +57,58 @@ const login = async (req, res) => {
   }
 };
 
+const resetPassword = async (req, res) => {
+  const { token } = req.params; // Ambil token dari parameter URL
+  const { newPassword } = req.body; // Password baru dari body request
+
+  if (!newPassword) {
+    return res.status(400).json({ message: 'Password baru diperlukan' });
+  }
+
+  try {
+    // Verifikasi token JWT
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+
+    // Ambil email dari token yang sudah di-decode
+    const email = decoded.email;
+
+    // Perbarui password di database
+    await UsersModel.resetPassword(email, newPassword);
+
+    res.status(200).json({ message: 'Password berhasil diperbarui' });
+  } catch (error) {
+    res.status(400).json({ message: 'Token tidak valid atau telah kedaluwarsa', error });
+  }
+};
+
+const forgetPassword = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ message: 'Email is required' });
+  }
+
+  try {
+    const user = await UsersModel.findUserByEmail(email);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Kirim email
+    const token = jwt.sign({ email }, process.env.SECRET_KEY, { expiresIn: '1h' });
+    const link = `${process.env.BASE_URL}/users/reset-password/${token}`;
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: email,
+      subject: 'Reset Password',
+      html: `<p>Klik <a href="${link}">link ini</a> untuk reset password</p>`,
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.status(200).json(requestResponse.successRequestResetPassword(email));
+  } catch (error) {
+    res.status(500).json(requestResponse.errorServer(error));
+  }
+}
 
 const getAllUsers = async (req, res) => {
   try {
@@ -101,6 +153,8 @@ const deleteUser = async (req, res) => {
 export default {
   register,
   login,
+  resetPassword,
+  forgetPassword,
   getAllUsers,
   getById,
   updateUser,

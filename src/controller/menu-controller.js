@@ -2,9 +2,40 @@ import MenuModel from '../models/menu-model.js';
 import requestResponse from '../config/response.js';
 import { deleteImage } from '../middleware/uploadConfig.js';
 
+// const getAll = async (req, res) => {
+//   try {
+//     const data = await MenuModel.getAll();
+//     const menu = data.map(item =>
+//     ({
+//       id: item.id,
+//       name: item.name,
+//       description: item.description,
+//       price: item.price,
+//       upload_menu: item.upload_menu,
+//       status: item.status === 1 ? true : false,
+//       category: {
+//         idKategori: item.idKategori,
+//         name: item.category_name,
+//         description: item.category_description,
+//       }
+//     }));
+//     res.json(requestResponse.suksesWithData(menu));
+//   } catch (error) {
+//     res.status(500).json(requestResponse.errorServer(error));
+//   }
+// }
+
 const getAll = async (req, res) => {
+  const { kategori, search } = req.query;
   try {
-    const data = await MenuModel.getAll();
+    let data;
+    if (search) {
+      data = await MenuModel.getByName(search);
+    } else if (kategori && kategori !== '0') {
+      data = await MenuModel.getByIdKategori(kategori);
+    } else {
+      data = await MenuModel.getAll();
+    }
     const menu = data.map(item =>
     ({
       id: item.id,
@@ -19,8 +50,10 @@ const getAll = async (req, res) => {
         description: item.category_description,
       }
     }));
+    console.log('menu', menu);
     res.json(requestResponse.suksesWithData(menu));
   } catch (error) {
+    console.log('error', error);
     res.status(500).json(requestResponse.errorServer(error));
   }
 }

@@ -19,6 +19,13 @@ const getAll = async () => {
   return rows;
 }
 
+// getbyname
+const getByName = async (name) => {
+  const query = 'SELECT * FROM menus WHERE name LIKE ?';
+  const [rows] = await dbPool.execute(query, [`%${name}%`]);
+  return rows;
+}
+
 // getbyid
 const getById = async (id) => {
   const SQLQuery = `
@@ -77,6 +84,7 @@ const deleteOne = async (id) => {
 export default {
   create,
   getAll,
+  getByName,
   getById,
   getByIdKategori,
   getByStatus,
