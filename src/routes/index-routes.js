@@ -7,6 +7,7 @@ import CartRoutes from './cart-routes.js';
 import OrderRoutes from './order-routes.js';
 import TransactionRoutes from './transaction-routes.js';
 import OrderMenuRoutes from './order-menu-routes.js';
+import QrCodeRoutes from './qrcode-routes.js';
 
 const router = express.Router();
 
@@ -18,6 +19,7 @@ router.use('/api/v1/menu', MenuRoutes);
 router.use('/api/v1/category', KategoriRoutes);
 router.use('/api/v1/stok', StokRoutes);
 router.use('/api/v1/users', UsersRoutes);
+router.use('/api/v1/qrcode', QrCodeRoutes);
 
 router.get('/', (req, res) => {
   res.json({
