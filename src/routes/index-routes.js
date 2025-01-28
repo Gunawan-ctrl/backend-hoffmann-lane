@@ -6,11 +6,13 @@ import UsersRoutes from './users-routes.js';
 import CartRoutes from './cart-routes.js';
 import OrderRoutes from './order-routes.js';
 import TransactionRoutes from './transaction-routes.js';
+import OrderMenuRoutes from './order-menu-routes.js';
 
 const router = express.Router();
 
 router.use('/api/v1/transaction', TransactionRoutes);
 router.use('/api/v1/order', OrderRoutes);
+router.use('/api/v1/order-menu', OrderMenuRoutes);
 router.use('/api/v1/cart', CartRoutes);
 router.use('/api/v1/menu', MenuRoutes);
 router.use('/api/v1/category', KategoriRoutes);
