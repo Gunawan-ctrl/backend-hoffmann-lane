@@ -11,6 +11,16 @@ const create = (body) => {
 const getAll = async () => {
   const SQLQuery = `
     SELECT
+      orders.*
+    FROM orders
+  `;
+  const [rows] = await dbPool.execute(SQLQuery);
+  return rows;
+}
+
+const getById = async (id) => {
+  const SQLQuery = `
+    SELECT
       orders.id,
       orders.gross_amount,
       orders.order_time,
@@ -20,22 +30,18 @@ const getAll = async () => {
       JSON_ARRAYAGG(
         JSON_OBJECT(
           'id_menu', orders_menus.id_menu,
-          'id_order', orders_menus.id_order,
+          'name', menus.name,
+          'description', menus.description,
           'qty', orders_menus.qty,
           'total', orders_menus.total
         )
       ) AS items
     FROM orders
     LEFT JOIN orders_menus ON orders.id = orders_menus.id_order
+    LEFT JOIN menus ON orders_menus.id_menu = menus.id
+    WHERE orders.id = ?
     GROUP BY orders.id
   `;
-  const [rows] = await dbPool.execute(SQLQuery);
-  return rows;
-}
-
-const getById = async (id) => {
-  const SQLQuery = `
-    SELECT * FROM orders WHERE id = ?`;
   const [rows] = await dbPool.execute(SQLQuery, [id]);
   return rows[0];
 }

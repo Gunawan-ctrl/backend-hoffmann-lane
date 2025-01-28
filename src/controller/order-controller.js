@@ -75,8 +75,27 @@ const getAll = async (req, res) => {
       qty: item.qty,
       gross_amount: item.gross_amount,
       table: item.table,
-      items: item.items
     }));
+    res.json(requestResponse.suksesWithData(order));
+  } catch (error) {
+    console.log('error', error);
+    res.status(500).json(requestResponse.errorServer(error));
+  }
+}
+
+const getById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const data = await orderModel.getById(id);
+    const order = {
+      id: data.id,
+      order_status: data.order_status,
+      order_time: data.order_time,
+      qty: data.qty,
+      gross_amount: data.gross_amount,
+      table: data.table,
+      items: data.items
+    };
     res.json(requestResponse.suksesWithData(order));
   } catch (error) {
     console.log('error', error);
@@ -108,6 +127,7 @@ const deleteOne = async (req, res) => {
 
 export default {
   createOrder,
+  getById,
   getAll,
   updateOne,
   deleteOne
