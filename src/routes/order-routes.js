@@ -5,6 +5,8 @@ const router = express.Router();
 
 router.post("/", orderController.createOrder);
 router.get("/", orderController.getAll);
+router.get("/total", orderController.getTotal);
+router.get("/summary", orderController.getOrderSummary);
 router.get("/:id", orderController.getById);
 router.put("/:id", orderController.updateOne);
 router.delete("/:id", orderController.deleteOne);

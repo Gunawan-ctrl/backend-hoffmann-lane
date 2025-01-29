@@ -13,6 +13,18 @@ const getAll = async () => {
   return rows;
 }
 
+const getTotalByMonth = async () => {
+  const SQLQuery = `
+    SELECT
+      MONTHNAME(created_at) AS month,
+      COUNT(*) AS count
+    FROM stok
+    GROUP BY MONTH(created_at)
+  `;
+  const [rows] = await dbPool.execute(SQLQuery);
+  return rows;
+}
+
 // getbyid
 const getById = async (id) => {
   const SQLQuery = 'SELECT * FROM stoks WHERE id = ?';
@@ -35,6 +47,7 @@ const deleteOne = async (id) => {
 
 export default {
   create,
+  getTotalByMonth,
   getAll,
   getById,
   updateOne,

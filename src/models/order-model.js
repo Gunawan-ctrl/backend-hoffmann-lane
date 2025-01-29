@@ -18,6 +18,32 @@ const getAll = async () => {
   return rows;
 }
 
+const getTotalAmount = async () => {
+  const SQLQuery = `
+    SELECT
+      SUM(gross_amount) AS total_amount
+    FROM orders
+  `;
+  const [rows] = await dbPool.execute(SQLQuery);
+  return rows[0].total_amount;
+}
+
+const getOrderSummaryByMonth = async () => {
+  const SQLQuery = `
+    SELECT
+      DATE_FORMAT(order_time, '%M') AS month, 
+      MONTH(order_time) AS month_number,
+      COUNT(*) AS total_orders,
+      SUM(gross_amount) AS total_amount
+    FROM orders
+    WHERE order_time >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+    GROUP BY month, month_number
+    ORDER BY month_number
+  `;
+  const [rows] = await dbPool.execute(SQLQuery);
+  return rows;
+};
+
 const getById = async (id) => {
   const SQLQuery = `
     SELECT
@@ -63,6 +89,8 @@ const deleteOne = async (id) => {
 
 export default {
   create,
+  getTotalAmount,
+  getOrderSummaryByMonth,
   getAll,
   getById,
   updateOne,

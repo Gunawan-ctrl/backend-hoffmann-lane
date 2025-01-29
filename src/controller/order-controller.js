@@ -1,4 +1,7 @@
 import orderModel from "../models/order-model.js";
+import StokModel from "../models/stok-model.js";
+import MenuModel from "../models/menu-model.js";
+import ReservationModel from "../models/reservation-model.js";
 import orderMenuModel from "../models/order-menu-model.js";
 import requestResponse from "../config/response.js";
 import midtransClient from 'midtrans-client';
@@ -19,7 +22,7 @@ const createOrder = async (req, res) => {
     // Create order in the database
     const result = await orderModel.create({
       gross_amount,
-      order_time: new Date(),
+      order_time: new Date().toISOString().slice(0, 19).replace('T', ' '),
       order_status,
       qty,
       table
@@ -83,6 +86,80 @@ const getAll = async (req, res) => {
   }
 }
 
+
+const getTotal = async (req, res) => {
+  try {
+    const totalAmount = await orderModel.getTotalAmount();
+    const orderData = await orderModel.getAll();
+    const stokData = await StokModel.getAll();
+    const menuData = await MenuModel.getAll();
+    const reservationData = await ReservationModel.getAll();
+
+    const totalOrders = orderData.length;
+    const totalStok = stokData.length;
+    const totalMenu = menuData.length
+    const totalReservation = reservationData.length;
+
+    const response = {
+      transaction: {
+        name: "Transaction",
+        total: totalAmount
+      },
+      stok: {
+        name: "Stok",
+        total: totalStok
+      },
+      menu: {
+        name: "Menu",
+        total: totalMenu
+      },
+      reservation: {
+        name: "Reservation",
+        total: totalReservation
+      }
+    };
+
+    res.json(requestResponse.suksesWithData(response));
+  } catch (error) {
+    console.log('error', error);
+    res.status(500).json(requestResponse.errorServer(error));
+  }
+}
+
+const getOrderSummary = async (req, res) => {
+  try {
+    const summaryData = await orderModel.getOrderSummaryByMonth();
+
+    const months = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+
+    const summaryMap = {};
+    summaryData.forEach(item => {
+      summaryMap[item.month] = {
+        total_orders: item.total_orders,
+        total_amount: item.total_amount
+      };
+    });
+
+    const response = {
+      status: true,
+      message: "Berhasil Memuat Data",
+      data: months.map(month => ({
+        month,
+        total_orders: summaryMap[month]?.total_orders || 0,
+        total_amount: summaryMap[month]?.total_amount || 0
+      }))
+    };
+
+    res.json(response);
+  } catch (error) {
+    console.log('error', error);
+    res.status(500).json(requestResponse.errorServer(error));
+  }
+};
+
 const getById = async (req, res) => {
   const { id } = req.params;
   try {
@@ -128,6 +205,8 @@ const deleteOne = async (req, res) => {
 export default {
   createOrder,
   getById,
+  getTotal,
+  getOrderSummary,
   getAll,
   updateOne,
   deleteOne
