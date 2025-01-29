@@ -2,7 +2,7 @@ import dbPool from '../config/database.js';
 
 const create = (body) => {
   const SQLQuery = `INSERT INTO reservations (name, date, time, phone, manyPeople)
-                        VALUES ('${body.name}', '${body.price}', '${body.time}', '${body.phone}', '${body.manyPeople}' )`;
+                        VALUES ('${body.name}', '${body.date}', '${body.time}', '${body.phone}', '${body.manyPeople}' )`;
 
   return dbPool.execute(SQLQuery);
 }
