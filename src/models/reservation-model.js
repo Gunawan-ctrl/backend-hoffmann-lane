@@ -1,8 +1,8 @@
 import dbPool from '../config/database.js';
 
 const create = (body) => {
-  const SQLQuery = `INSERT INTO reservations (name, date, time, phone, manyPeople)
-                        VALUES ('${body.name}', '${body.date}', '${body.time}', '${body.phone}', '${body.manyPeople}' )`;
+  const SQLQuery = `INSERT INTO reservations (name, date, time, phone, manyPeople, room)
+                        VALUES ('${body.name}', '${body.date}', '${body.time}', '${body.phone}', '${body.manyPeople}', '${body.room}' )`;
 
   return dbPool.execute(SQLQuery);
 }
@@ -22,8 +22,8 @@ const getById = async (id) => {
 
 
 const updateOne = async (body, id) => {
-  const SQLQuery = `UPDATE reservations SET name = ?, date = ?, time = ?, phone = ?, manyPeople = ? WHERE id = ?`;
-  const [result] = await dbPool.execute(SQLQuery, [body.name, body.date, body.time, body.phone, body.manyPeople, id]);
+  const SQLQuery = `UPDATE reservations SET name = ?, date = ?, time = ?, phone = ?, manyPeople = ?, room = ? WHERE id = ?`;
+  const [result] = await dbPool.execute(SQLQuery, [body.name, body.date, body.time, body.phone, body.manyPeople, body.room, id]);
   return result;
 }
 
