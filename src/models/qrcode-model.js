@@ -1,10 +1,18 @@
 import dbPool from '../config/database.js';
 
-const create = (body) => {
+const create = async (body) => {
   const SQLQuery = `INSERT INTO qr_codes (\`table\`, imageQr)
-                        VALUES ('${body.table}', '${body.imageQr}' )`;
+                    VALUES (?, ?)`;
 
-  return dbPool.execute(SQLQuery);
+  try {
+    await dbPool.execute(SQLQuery, [body.table, body.imageQr]);
+    return { success: true, message: 'QR code created successfully' };
+  } catch (error) {
+    if (error.code === 'ER_DUP_ENTRY') {
+      return { success: false, message: 'Table already has a QR code' };
+    }
+    throw error;
+  }
 }
 
 const getAll = async () => {

@@ -16,10 +16,6 @@ const createQrCode = async (req, res) => {
   try {
     // Get baseURL from environment variable
     let baseURL = process.env.BASE_URL;
-    if (req.hostname !== 'localhost') {
-      baseURL = `http://${req.hostname}`;
-    }
-
     // Generate QR code link
     const qrCodeLink = `${baseURL}/menu?meja=${table}`;
     const qrCodeFileName = `qrcode_${table}.png`;
