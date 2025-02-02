@@ -44,6 +44,20 @@ const getOrderSummaryByMonth = async () => {
   return rows;
 };
 
+const getMostOrderedItems = async () => {
+  const SQLQuery = `
+    SELECT
+      id_menu,
+      SUM(qty) AS total_qty
+    FROM orders_menus
+    GROUP BY id_menu
+    ORDER BY total_qty DESC
+    LIMIT 5
+  `;
+  const [rows] = await dbPool.execute(SQLQuery);
+  return rows;
+}
+
 const getById = async (id) => {
   const SQLQuery = `
     SELECT
@@ -91,6 +105,7 @@ export default {
   create,
   getTotalAmount,
   getOrderSummaryByMonth,
+  getMostOrderedItems,
   getAll,
   getById,
   updateOne,

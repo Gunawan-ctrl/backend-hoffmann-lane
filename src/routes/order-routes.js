@@ -7,6 +7,7 @@ router.post("/", orderController.createOrder);
 router.get("/", orderController.getAll);
 router.get("/total", orderController.getTotal);
 router.get("/summary", orderController.getOrderSummary);
+router.get("/most-ordered", orderController.getMostOrderedItems);
 router.get("/:id", orderController.getById);
 router.put("/:id", orderController.updateOne);
 router.delete("/:id", orderController.deleteOne);

@@ -6,6 +6,7 @@ import orderMenuModel from "../models/order-menu-model.js";
 import requestResponse from "../config/response.js";
 import midtransClient from 'midtrans-client';
 import { config as configDotenv } from 'dotenv';
+import menuModel from "../models/menu-model.js";
 
 configDotenv();
 
@@ -90,12 +91,10 @@ const getAll = async (req, res) => {
 const getTotal = async (req, res) => {
   try {
     const totalAmount = await orderModel.getTotalAmount();
-    const orderData = await orderModel.getAll();
     const stokData = await StokModel.getAll();
     const menuData = await MenuModel.getAll();
     const reservationData = await ReservationModel.getAll();
 
-    const totalOrders = orderData.length;
     const totalStok = stokData.length;
     const totalMenu = menuData.length
     const totalReservation = reservationData.length;
@@ -160,6 +159,42 @@ const getOrderSummary = async (req, res) => {
   }
 };
 
+const getMostOrderedItems = async (req, res) => {
+  try {
+    const data = await orderModel.getMostOrderedItems();
+    const detailedData = await Promise.all(data.map(async (item) => {
+      const menuDetails = await menuModel.getById(item.id_menu);
+      if (menuDetails) {
+        return {
+          id_menu: item.id_menu,
+          total_qty: item.total_qty,
+          name: menuDetails.name,
+          description: menuDetails.description,
+          category: menuDetails.category_name
+        };
+      } else {
+        return {
+          id_menu: item.id_menu,
+          total_qty: item.total_qty,
+          name: "Unknown",
+          description: "Unknown",
+          category: "Unknown"
+        };
+      }
+    }));
+
+    // const response = {
+    //   status: true,
+    //   message: "Berhasil Memuat Data",
+    //   data: detailedData
+    // };
+    res.json(requestResponse.suksesWithData(detailedData));
+  } catch (error) {
+    console.log('error', error);
+    res.status(500).json(requestResponse.errorServer(error));
+  }
+}
+
 const getById = async (req, res) => {
   const { id } = req.params;
   try {
@@ -206,6 +241,7 @@ export default {
   createOrder,
   getById,
   getTotal,
+  getMostOrderedItems,
   getOrderSummary,
   getAll,
   updateOne,
